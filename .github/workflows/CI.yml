@@ -95,7 +95,8 @@ jobs:
 
   open_pr:
     needs: [test_with_maven, docker]
-    - name: Create PR.
+    -
+      name: Create PR.
       #if: success()
       uses: repo-sync/pull-request@v2
       with:
