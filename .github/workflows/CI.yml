@@ -95,12 +95,13 @@ jobs:
 
   open_pr:
     needs: [test_with_maven, docker]
-    -
-      name: Create PR.
-      #if: success()
-      uses: repo-sync/pull-request@v2
-      with:
-        destination_branch: "master"
-        pr_title: "New Patch"
-        pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-        github_token: ${{ secrets.GIT_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Create PR
+        uses: repo-sync/pull-request@v2        
+        with:
+          destination_branch: "master"
+          pr_title: "New Patch"
+          pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
+          github_token: ${{ secrets.GIT_TOKEN }}
