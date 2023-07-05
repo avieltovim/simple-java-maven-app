@@ -55,6 +55,30 @@ jobs:
         name: Test
         run: |
           docker run --rm avieltovim/java-app:test
+
+      #- uses: actions/checkout@v3
+      -
+        name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          # cache: maven
+      -
+        name:  Bump patch version with Maven
+        run: mvn --batch-mode --update-snapshots -DbumpPatch validate
+      -
+        name: Push back to repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI_COMMIT_MESSAGE: Updated patch version in pom.xml
+          CI_COMMIT_AUTHOR: CI workflow
+          JAR_VERSION: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git add pom.xml
+          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push
       -
         name: Build and push
         uses: docker/build-push-action@v4
@@ -62,30 +86,10 @@ jobs:
           # context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: avieltovim/java-app:latest
+          tags: avieltovim/java-app:"${{ env.JAR_VERSION }}"
 
-  bump_patch_version:
-    needs: [test_with_maven, docker]
-    runs-on: ubuntu-latest
+  #bump_patch_version:
+  #  needs: [test_with_maven, docker]
+  #  runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-          # cache: maven
-      - name:  Bump patch version with Maven
-        run: mvn --batch-mode --update-snapshots -DbumpPatch validate
-      - name: Push back to repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CI_COMMIT_MESSAGE: Updated patch version in pom.xml
-          CI_COMMIT_AUTHOR: CI workflow
-        run: |
-          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git add pom.xml
-          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-          git push
-
+  #  steps:
