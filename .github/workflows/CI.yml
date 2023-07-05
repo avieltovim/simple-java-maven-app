@@ -93,7 +93,7 @@ jobs:
           push: true
           tags: avieltovim/java-app:${{ env.PROJECT_VERSION }}
 
-  pr_request:
+  open_pr:
     needs: [test_with_maven, docker]
     - name: Create PR.
       #if: success()
