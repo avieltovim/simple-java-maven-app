@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI_COMMIT_MESSAGE: Updated patch version in pom.xml
           CI_COMMIT_AUTHOR: CI workflow
-          JAR_VERSION: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          #JAR_VERSION: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "avieltovim@gmail.com"
@@ -81,13 +81,21 @@ jobs:
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push
       -
+        name: Get project version
+        id: get-version
+        run: |
+          echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+      -
+        name: Display project version
+        run: echo "Project version: ${{ env.PROJECT_VERSION }}"
+      -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           # context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: avieltovim/java-app:"${{ env.JAR_VERSION }}"
+          tags: avieltovim/java-app:"${{ env.PROJECT_VERSION }}"
 
   #bump_patch_version:
   #  needs: [test_with_maven, docker]
