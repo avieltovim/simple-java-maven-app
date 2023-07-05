@@ -85,7 +85,7 @@ jobs:
         id: get-version
         run: |
           version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          version=$(echo "$version" | sed 's/[^0-9.]*//g')
+          version=$(echo "$version" | sed 's/"//g')
           echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
       #-
         #name: Display project version
