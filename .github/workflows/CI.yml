@@ -76,6 +76,7 @@ jobs:
           JAR_VERSION: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "avieltovim@gmail.com"
           git add pom.xml
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push
