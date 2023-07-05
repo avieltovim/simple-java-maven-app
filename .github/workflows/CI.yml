@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - 'development'
-      
+
 #permissions:
      # contents: read
       #packages: write
@@ -17,7 +17,7 @@ jobs:
 
   test_with_maven:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -27,7 +27,7 @@ jobs:
           distribution: 'temurin'
       - name:  test with Maven
         run: mvn --batch-mode --update-snapshots test
-        
+
   docker:
     runs-on: ubuntu-latest
     steps:
@@ -49,22 +49,23 @@ jobs:
         with:
           push: true
           tags: avieltovim/java-app:latest
-          
+
   bump_patch_version:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: '11'
           distribution: 'temurin'
           # cache: maven
       - name:  Bump patch version with Maven
         run: mvn --batch-mode --update-snapshots -DbumpPatch validate
       - name: Push back to repo
-        env: 
+        env:
           CI_COMMIT_MESSAGE: Updated patch version in pom.xml
           CI_COMMIT_AUTHOR: CI workflow
         run: |
@@ -73,7 +74,7 @@ jobs:
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push
 
-    
+
 #        java-version: '11'
  #       distribution: 'temurin'
   #      server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
