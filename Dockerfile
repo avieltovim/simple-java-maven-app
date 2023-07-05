@@ -9,4 +9,4 @@ From openjdk:11.0.4-jre-slim
 
 COPY --from=builder /target/*.jar ./java_app.jar
 
-ENTRYPOINT ["java", "-jr", "java_app.jar"]
+ENTRYPOINT ["java", "-jar", "java_app.jar"]
