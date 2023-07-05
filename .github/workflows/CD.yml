@@ -1,0 +1,31 @@
+#on:
+#  pull_request_review:
+#    types: [submitted]
+#    branches:
+#      - master
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    types: [ closed ]
+
+jobs:
+  deploy:
+    #if: github.event.review.state == 'approved'
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set tagging value
+      run: echo "GITHUB_TAG=$(echo ${{ secrets.DOCKER_HUB_USERNAME }}/java-app:$(cat pom.xml | grep version | head -1 | awk -F'[><]' '{print $3}'))" >> $GITHUB_ENV
+
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.DEPLOYMENT_HOST }}
+        username: ${{ secrets.DEPLOYMENT_HOST_USERNAME }}
+        key: ${{ secrets.DEPLOYMENT_HOST_ID_RSA }}
+        script: |
+          sudo docker pull ${{ GITHUB_TAG }}
+          sudo docker run -d ${{ GITHUB_TAG }}
