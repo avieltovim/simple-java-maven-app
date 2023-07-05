@@ -84,7 +84,9 @@ jobs:
         name: Get project version
         id: get-version
         run: |
-          echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          version=$(echo "$version" | sed 's/[^0-9.]*//g')
+          echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
       #-
         #name: Display project version
         #run: echo "Project version: ${{ env.PROJECT_VERSION }}"
