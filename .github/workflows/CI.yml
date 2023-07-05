@@ -85,9 +85,9 @@ jobs:
         id: get-version
         run: |
           echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-      -
-        name: Display project version
-        run: echo "Project version: ${{ env.PROJECT_VERSION }}"
+      #-
+        #name: Display project version
+        #run: echo "Project version: ${{ env.PROJECT_VERSION }}"
       -
         name: Build and push
         uses: docker/build-push-action@v4
