@@ -28,17 +28,23 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: maven
       - name:  test with Maven
         run: mvn --batch-mode --update-snapshots test
 
   docker:
     needs: test_with_maven
     runs-on: ubuntu-latest
+
+    outputs:
+      github_tag: ${{ steps.patch_tag.outputs.new_tag }}
+
     steps:
+      #-
+        #name: Set up QEMU
+        #uses: docker/setup-qemu-action@v2
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
+        # Allows building multi-platform images, export cache, etc.
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       -
@@ -58,8 +64,7 @@ jobs:
       -
         name: Test
         run: |
-          docker run --rm avieltovim/java-app:test
-
+          [ "$(docker run --rm avieltovim/java-app:test)" == "Hello World!" ] || exit 1
       - uses: actions/checkout@v3
       -
         name: Set up JDK 11
@@ -67,7 +72,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          # cache: maven
+          cache: maven
       -
         name:  Bump patch version with Maven
         run: mvn --batch-mode --update-snapshots -DbumpPatch validate
@@ -90,12 +95,26 @@ jobs:
           version=$(echo "$version" | sed 's/"//g')
           echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
       -
+        name: Bump version and push tag
+        id: patch_tag
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: 1.0.20
+          DEFAULT_BUMP: patch
+        with:
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          release_branches: 'master'
+
+      -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/amd64,linux/arm64
+          #platforms: linux/amd64,linux/arm64
           push: true
           tags: avieltovim/java-app:${{ env.PROJECT_VERSION }}
+
 
   open_pr:
     needs: [test_with_maven, docker]
@@ -103,15 +122,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: create pull request
-        run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
+        run: |
+          git checkout -b ${{ needs.docker.outputs.github_tag }}
+          git push -u origin ${{ needs.docker.outputs.github_tag }}
+          gh pr create -B master -H ${{ needs.docker.outputs.github_tag }} --title 'Merge new patch to production' --body 'Created by Github action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #steps:
-    #  -
-    #    name: Create PR
-    #    uses: repo-sync/pull-request@v2
-    #    with:
-    #      destination_branch: "master"
-    #      pr_title: "New Patch"
-    #      pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-    #      github_token: ${{ secrets.GITHUB_TOKEN }}
