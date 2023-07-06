@@ -99,11 +99,16 @@ jobs:
     needs: [test_with_maven, docker]
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Create PR
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: "master"
-          pr_title: "New Patch"
-          pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: create pull request
+      run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #steps:
+    #  -
+    #    name: Create PR
+    #    uses: repo-sync/pull-request@v2
+    #    with:
+    #      destination_branch: "master"
+    #      pr_title: "New Patch"
+    #      pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
+    #      github_token: ${{ secrets.GITHUB_TOKEN }}
