@@ -35,10 +35,11 @@ jobs:
     needs: test_with_maven
     runs-on: ubuntu-latest
     steps:
+      #-
+        #name: Set up QEMU
+        #uses: docker/setup-qemu-action@v2
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
+        # Allows building multi-platform images, export cache, etc.
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       -
@@ -58,7 +59,7 @@ jobs:
       -
         name: Test
         run: |
-          [ "$(docker run --rm --name HelloWorld avieltovim/java-app:test)" == "Hello World!" ] || exit 1
+          [ "$(docker run --rm avieltovim/java-app:test)" == "Hello World!" ] || exit 1
       - uses: actions/checkout@v3
       -
         name: Set up JDK 11
@@ -92,7 +93,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/amd64,linux/arm64
+          #platforms: linux/amd64,linux/arm64
           push: true
           tags: avieltovim/java-app:${{ env.PROJECT_VERSION }}
 
