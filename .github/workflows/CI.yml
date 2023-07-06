@@ -58,8 +58,8 @@ jobs:
       -
         name: Test
         run: |
-          docker run --rm avieltovim/java-app:test
-
+          docker run --rm --name HelloWorld avieltovim/java-app:test
+          [ "$(docker logs HelloWorld)" == "Hello World!" ] || exit 1
       - uses: actions/checkout@v3
       -
         name: Set up JDK 11
@@ -67,7 +67,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          # cache: maven
+          cache: maven
       -
         name:  Bump patch version with Maven
         run: mvn --batch-mode --update-snapshots -DbumpPatch validate
@@ -106,12 +106,3 @@ jobs:
         run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #steps:
-    #  -
-    #    name: Create PR
-    #    uses: repo-sync/pull-request@v2
-    #    with:
-    #      destination_branch: "master"
-    #      pr_title: "New Patch"
-    #      pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-    #      github_token: ${{ secrets.GITHUB_TOKEN }}
