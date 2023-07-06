@@ -77,23 +77,19 @@ jobs:
         name:  Bump patch version with Maven
         run: mvn --batch-mode --update-snapshots -DbumpPatch validate
       -
-        name: Push back to repo
-        env:
-          CI_COMMIT_MESSAGE: Updated patch version in pom.xml
-          CI_COMMIT_AUTHOR: CI workflow
-        run: |
-          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git config --global user.email "avieltovim@gmail.com"
-          git add pom.xml
-          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-          git push
-      -
         name: Get project version
         id: get-version
         run: |
           version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           version=$(echo "$version" | sed 's/"//g')
           echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          #platforms: linux/amd64,linux/arm64
+          push: true
+          tags: avieltovim/java-app:${{ env.PROJECT_VERSION }}
       -
         name: Bump version and push tag
         id: patch_tag
@@ -106,14 +102,19 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           release_branches: 'master'
-
       -
-        name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          #platforms: linux/amd64,linux/arm64
-          push: true
-          tags: avieltovim/java-app:${{ env.PROJECT_VERSION }}
+        name: Push back to repo
+        env:
+          CI_COMMIT_MESSAGE: Updated patch version in pom.xml
+          CI_COMMIT_AUTHOR: CI workflow
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "avieltovim@gmail.com"
+          git add pom.xml
+          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push
+
+
 
 
   open_pr:
