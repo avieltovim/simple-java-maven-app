@@ -124,6 +124,7 @@ jobs:
       - name: create pull request
         run: |
           git checkout -b ${{ needs.docker.outputs.github_tag }}
+          git push -u origin ${{ needs.docker.outputs.github_tag }}
           gh pr create -B master -H ${{ needs.docker.outputs.github_tag }} --title 'Merge new patch to production' --body 'Created by Github action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
