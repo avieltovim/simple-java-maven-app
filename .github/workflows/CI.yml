@@ -58,8 +58,7 @@ jobs:
       -
         name: Test
         run: |
-          docker run --rm --name HelloWorld avieltovim/java-app:test
-          [ "$(docker logs HelloWorld)" == "Hello World!" ] || exit 1
+          [ "$(docker run --rm --name HelloWorld avieltovim/java-app:test)" == "Hello World!" ] || exit 1
       - uses: actions/checkout@v3
       -
         name: Set up JDK 11
