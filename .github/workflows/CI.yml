@@ -28,6 +28,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: maven
       - name:  test with Maven
         run: mvn --batch-mode --update-snapshots test
 
@@ -103,6 +104,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: create pull request
-        run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
+        run: |
+          git checkout -b ${{ env.PROJECT_VERSION }}
+          gh pr create -B master -H ${{ env.PROJECT_VERSION }} --title 'Merge new patch to production' --body 'Created by Github action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
