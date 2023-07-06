@@ -106,4 +106,4 @@ jobs:
           destination_branch: "master"
           pr_title: "New Patch"
           pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-          github_token: $GITHUB_TOKEN
+          github_token: ${{ secrets.GITHUB_TOKEN }}
