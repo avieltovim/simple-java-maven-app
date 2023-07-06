@@ -99,9 +99,10 @@ jobs:
     needs: [test_with_maven, docker]
     runs-on: ubuntu-latest
     steps:
-    - name: create pull request
-      run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
-      env:
+      - uses: actions/checkout@v3
+      - name: create pull request
+        run: gh pr create -B master -H development --title 'Merge new patch to production' --body 'Created by Github action'
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #steps:
     #  -
