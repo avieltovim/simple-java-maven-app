@@ -27,5 +27,4 @@ jobs:
         username: ${{ secrets.DEPLOYMENT_HOST_USERNAME }}
         key: ${{ secrets.DEPLOYMENT_HOST_ID_RSA }}
         script: |
-          #sudo docker pull ${{ IMAGE_TAG }}
           sudo docker run -d ${{ env.IMAGE_TAG }}
