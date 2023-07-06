@@ -9,6 +9,9 @@ on:
     branches:
       - 'development'
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 #permissions:
      # contents: read
       #packages: write
@@ -69,7 +72,6 @@ jobs:
       -
         name: Push back to repo
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI_COMMIT_MESSAGE: Updated patch version in pom.xml
           CI_COMMIT_AUTHOR: CI workflow
         run: |
@@ -97,11 +99,11 @@ jobs:
     needs: [test_with_maven, docker]
     runs-on: ubuntu-latest
     steps:
-      - 
+      -
         name: Create PR
-        uses: repo-sync/pull-request@v2        
+        uses: repo-sync/pull-request@v2
         with:
           destination_branch: "master"
           pr_title: "New Patch"
           pr_body: "Patch Version: ${{ env.PROJECT_VERSION }}"
-          github_token: ${{ secrets.GIT_TOKEN }}
+          github_token: $GITHUB_TOKEN
